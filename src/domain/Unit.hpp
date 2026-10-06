@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Health.hpp"
 #include "Armor.hpp"
 #include "Attack.hpp"
@@ -14,11 +16,11 @@ public:
     Unit(Unit&& other) = delete;
     Unit& operator=(Unit&& other) = delete;
 
-    int pos_x();
-    int pos_y();
-    Health health();
-    Armor armor();
-    Attack attack();
+    int pos_x() const;
+    int pos_y() const;
+    Health health() const;
+    Armor armor() const;
+    Attack attack() const;
 
     void change_pos(int pos_x, int pos_y);
 
