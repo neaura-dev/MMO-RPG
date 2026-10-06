@@ -1,3 +1,5 @@
+#pragma once
+
 class Armor {
 public:
     Armor(int value);

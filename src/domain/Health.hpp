@@ -1,3 +1,5 @@
+#pragma once
+
 class Health {
 public:
     Health(int value);
