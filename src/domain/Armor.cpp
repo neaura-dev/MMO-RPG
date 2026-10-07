@@ -8,3 +8,5 @@ Armor::Armor(int value) : value_(value) {
 }
 
 int Armor::value() const { return value_; }
+
+int Armor::reduce_damage(const Attack& attack) { return attack.value() - value_; }
