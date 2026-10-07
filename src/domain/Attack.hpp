@@ -8,7 +8,7 @@ public:
 
     int value() const;
 
-    int calculateDamage(const Armor& armor);
+    int calculate_damage(const Armor& armor) const;
 
 private:
     int value_;
