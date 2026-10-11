@@ -4,6 +4,12 @@
 #include "Armor.hpp"
 #include "Attack.hpp"
 
+enum class UnitType {
+    KingdomGuardian,
+    ForestKeeper,
+    Undead
+};
+
 class Unit {
 public:
     Unit(int pos_x, int pos_y, Health health, Armor armor, Attack attack);
@@ -23,6 +29,8 @@ public:
     Attack attack() const;
 
     void change_pos(int pos_x, int pos_y);
+
+    virtual UnitType type() const = 0;
 
 private:
     int pos_x_;
