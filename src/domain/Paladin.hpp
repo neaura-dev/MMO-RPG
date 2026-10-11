@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Knight.hpp"
 
 class Paladin : public Knight {
