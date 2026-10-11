@@ -1,6 +1,6 @@
-#include "CrossbowMan.hpp"
+#include "ShadowArcher.hpp"
 
-CrossbowMan::CrossbowMan(int pos_x, int pos_y)
-    : Archer(pos_x, pos_y), type_(UnitType::KingdomGuardian) {}
+ShadowArcher::ShadowArcher(int pos_x, int pos_y)
+    : Archer(pos_x, pos_y), type_(UnitType::Undead) {}
 
-UnitType CrossbowMan::type() const { return type_; }
+UnitType ShadowArcher::type() const { return type_; }
