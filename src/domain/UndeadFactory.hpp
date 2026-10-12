@@ -5,7 +5,7 @@
 #include "ShadowArcher.hpp"
 #include "Necromancer.hpp"
 
-class ForestKeeperFactory : public UnitFactory {
+class UndeadFactory : public UnitFactory {
 public:
     std::unique_ptr<Knight> create_knight() const override;
     std::unique_ptr<Archer> create_archer() const override;
