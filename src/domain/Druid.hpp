@@ -10,6 +10,8 @@ public:
 
     UnitType type() const override;
 
+    std::unique_ptr<Unit> clone() const override;
+
 private:
     UnitType type_;
 };

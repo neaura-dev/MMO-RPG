@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "Health.hpp"
 #include "Armor.hpp"
 #include "Attack.hpp"
@@ -31,6 +32,8 @@ public:
     void change_pos(int pos_x, int pos_y);
 
     virtual UnitType type() const = 0;
+
+    virtual std::unique_ptr<Unit> clone() const = 0;
 
 private:
     int pos_x_;

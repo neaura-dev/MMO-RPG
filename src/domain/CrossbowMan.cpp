@@ -1,6 +1,10 @@
-#include "ShadowArcher.hpp"
+#include "CrossbowMan.hpp"
 
-ShadowArcher::ShadowArcher(int pos_x, int pos_y)
-    : Archer(pos_x, pos_y), type_(UnitType::Undead) {}
+CrossbowMan::CrossbowMan(int pos_x, int pos_y)
+    : Archer(pos_x, pos_y), type_(UnitType::KingdomGuardian) {}
 
-UnitType ShadowArcher::type() const { return type_; }
+UnitType CrossbowMan::type() const { return type_; }
+
+std::unique_ptr<Unit> CrossbowMan::clone() const {
+    return std::make_unique<CrossbowMan>(*this);
+}
