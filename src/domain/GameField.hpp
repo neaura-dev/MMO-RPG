@@ -8,6 +8,22 @@ class GameFieldIterator;
 
 class GameField {
 public:
+    class GameFieldIterator {
+    public:
+        explicit GameFieldIterator(std::vector<std::unique_ptr<Unit>>::iterator iterator);
+
+        Unit& operator*() const;
+
+        GameFieldIterator& operator++();
+        GameFieldIterator operator++(int);
+
+        bool operator==(const GameFieldIterator& other) const;
+        bool operator!=(const GameFieldIterator& other) const;
+
+    private:
+        std::vector<std::unique_ptr<Unit>>::iterator iterator_;
+    };
+
     GameField(int width, int height, int max_units);
 
     ~GameField();
@@ -36,8 +52,6 @@ public:
 
     GameFieldIterator begin();
     GameFieldIterator end();
-
-    friend class GameFieldIterator;
 
 private:
     int width_;
