@@ -17,7 +17,7 @@ public:
 
     virtual ~Unit() = default;
 
-    Unit(const Unit& other) = delete;
+    Unit(const Unit& other) = default;
     Unit& operator=(const Unit& other) = delete;
 
     Unit(Unit&& other) = delete;
@@ -25,9 +25,10 @@ public:
 
     int pos_x() const;
     int pos_y() const;
-    Health health() const;
-    Armor armor() const;
-    Attack attack() const;
+    Health& health();
+    const Health& health() const;
+    const Armor& armor() const;
+    const Attack& attack() const;
 
     void change_pos(int pos_x, int pos_y);
 

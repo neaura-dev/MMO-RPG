@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Armor.hpp"
+class Armor;
 
 class Attack {
 public:
-    Attack(int value);
+    explicit Attack(int value);
 
     int value() const;
 

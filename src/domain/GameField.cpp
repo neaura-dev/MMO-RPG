@@ -1,5 +1,7 @@
-#include <stdexcept>
 #include <algorithm>
+#include <limits>
+#include <stdexcept>
+#include <utility>
 #include "GameField.hpp"
 
 GameField::GameField(int width, int height, int max_units)
@@ -13,7 +15,15 @@ GameField::GameField(int width, int height, int max_units)
     if (max_units < 0) {
         throw std::invalid_argument("GameField: max_units cannot be negative");
     }
-    units_.resize(static_cast<size_t>(width_ * height_));
+    if (width_ > std::numeric_limits<int>::max() / height_) {
+        throw std::length_error("GameField: dimensions are too large");
+    }
+    const auto cell_count = static_cast<std::size_t>(width_) *
+                            static_cast<std::size_t>(height_);
+    units_.resize(cell_count);
+    if (static_cast<std::size_t>(max_units_) > cell_count) {
+        max_units_ = static_cast<int>(cell_count);
+    }
 }
 
 GameField::~GameField() {
@@ -78,16 +88,24 @@ size_t GameField::size() const { return size_; }
 const std::vector<std::unique_ptr<Unit>>& GameField::units() const { return units_; }
 
 void GameField::add_unit(std::unique_ptr<Unit> unit) {
-    if (size_ >= max_units_) {
+    if (!unit) {
+        throw std::invalid_argument("GameField: unit cannot be null");
+    }
+    if (size_ >= static_cast<std::size_t>(max_units_)) {
         throw std::out_of_range("GameField: units are already full");
     }
-    if (unit->pos_x() >= width_ || unit->pos_y() >= height_) {
+    const int x = unit->pos_x();
+    const int y = unit->pos_y();
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) {
         throw std::out_of_range("GameField: unit position is out of range");
     }
-    if (units_[unit->pos_y() * width_ + unit->pos_x()] != nullptr) {
+    const auto index = static_cast<std::size_t>(y) *
+                       static_cast<std::size_t>(width_) +
+                       static_cast<std::size_t>(x);
+    if (units_[index] != nullptr) {
         throw std::logic_error("GameField: cell is already occupied");
     }
-    units_[unit->pos_y() * width_ + unit->pos_x()] = std::move(unit);
+    units_[index] = std::move(unit);
     size_++;
 }
 
@@ -98,23 +116,39 @@ void GameField::remove_unit(int pos_x, int pos_y) {
     if (pos_y < 0 || pos_y >= height_) {
         throw std::invalid_argument("GameField: pos_y is out of range");
     }
-    if (units_[pos_y * width_ + pos_x] != nullptr) {
-        units_[pos_y * width_ + pos_x].reset();
+    const auto index = static_cast<std::size_t>(pos_y) *
+                       static_cast<std::size_t>(width_) +
+                       static_cast<std::size_t>(pos_x);
+    if (units_[index] != nullptr) {
+        units_[index].reset();
         size_--;
     }
 }
 
-Unit* GameField::get_unit(int pos_x, int pos_y) const {
+Unit* GameField::get_unit(int pos_x, int pos_y) {
     if (pos_x < 0 || pos_x >= width_) {
         throw std::invalid_argument("GameField: pos_x is out of range");
     }
     if (pos_y < 0 || pos_y >= height_) {
         throw std::invalid_argument("GameField: pos_y is out of range");
     }
-    if (units_[pos_y * width_ + pos_x] == nullptr) {
-        return nullptr;
+    const auto index = static_cast<std::size_t>(pos_y) *
+                       static_cast<std::size_t>(width_) +
+                       static_cast<std::size_t>(pos_x);
+    return units_[index].get();
+}
+
+const Unit* GameField::get_unit(int pos_x, int pos_y) const {
+    if (pos_x < 0 || pos_x >= width_) {
+        throw std::invalid_argument("GameField: pos_x is out of range");
     }
-    return units_[pos_y * width_ + pos_x].get();
+    if (pos_y < 0 || pos_y >= height_) {
+        throw std::invalid_argument("GameField: pos_y is out of range");
+    }
+    const auto index = static_cast<std::size_t>(pos_y) *
+                       static_cast<std::size_t>(width_) +
+                       static_cast<std::size_t>(pos_x);
+    return units_[index].get();
 }
 
 bool GameField::empty() const { return size_ == 0; }
@@ -127,20 +161,33 @@ void GameField::clear() {
 }
 
 GameField::GameFieldIterator GameField::begin() {
-    return GameFieldIterator(units_.begin());
+    return GameFieldIterator(units_.begin(), units_.end());
 }
 
 GameField::GameFieldIterator GameField::end() {
-    return GameFieldIterator(units_.end());
+    return GameFieldIterator(units_.end(), units_.end());
 }
 
-GameField::GameFieldIterator::GameFieldIterator(std::vector<std::unique_ptr<Unit>>::iterator iterator)
-    : iterator_(iterator) {}
+GameField::GameFieldIterator::GameFieldIterator(
+    std::vector<std::unique_ptr<Unit>>::iterator current,
+    std::vector<std::unique_ptr<Unit>>::iterator end)
+    : iterator_(current), end_(end) {
+    skip_empty();
+}
+
+void GameField::GameFieldIterator::skip_empty() {
+    while (iterator_ != end_ && !*iterator_) {
+        ++iterator_;
+    }
+}
 
 Unit& GameField::GameFieldIterator::operator*() const { return **iterator_; }
 
 GameField::GameFieldIterator& GameField::GameFieldIterator::operator++() {
-    ++iterator_;
+    if (iterator_ != end_) {
+        ++iterator_;
+        skip_empty();
+    }
     return *this;
 }
 GameField::GameFieldIterator GameField::GameFieldIterator::operator++(int) {
