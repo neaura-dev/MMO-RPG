@@ -1,7 +1,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include "GameField.hpp"
-#include "GameFieldIterator.hpp"
 
 GameField::GameField(int width, int height, int max_units)
     : width_(width), height_(height), max_units_(max_units), size_(0) {
@@ -127,10 +126,32 @@ void GameField::clear() {
     size_ = 0;
 }
 
-GameFieldIterator GameField::begin() {
-    return GameFieldIterator(this, 0, 0);
+GameField::GameFieldIterator GameField::begin() {
+    return GameFieldIterator(units_.begin());
 }
 
-GameFieldIterator GameField::end() {
-    return GameFieldIterator(this, 0, height_);
+GameField::GameFieldIterator GameField::end() {
+    return GameFieldIterator(units_.end());
+}
+
+GameField::GameFieldIterator::GameFieldIterator(std::vector<std::unique_ptr<Unit>>::iterator iterator)
+    : iterator_(iterator) {}
+
+Unit& GameField::GameFieldIterator::operator*() const { return **iterator_; }
+
+GameField::GameFieldIterator& GameField::GameFieldIterator::operator++() {
+    ++iterator_;
+    return *this;
+}
+GameField::GameFieldIterator GameField::GameFieldIterator::operator++(int) {
+    GameFieldIterator old = *this;
+    ++(*this);
+    return old;
+}
+
+bool GameField::GameFieldIterator::operator==(const GameFieldIterator& other) const {
+    return iterator_ == other.iterator_;
+}
+bool GameField::GameFieldIterator::operator!=(const GameFieldIterator& other) const {
+    return !(*this == other);
 }
