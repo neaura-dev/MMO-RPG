@@ -2,9 +2,7 @@
 #include <memory>
 #include <utility>
 #include "domain/GameField.hpp"
-#include "domain/KingdomGuardianFactory.hpp"
-#include "domain/ForestKeeperFactory.hpp"
-#include "domain/UndeadFactory.hpp"
+#include "domain/UnitFactory.hpp"
 
 void print_field(const GameField& field) {
     std::cout << "Units on field: " << field.size() << std::endl;
