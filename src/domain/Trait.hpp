@@ -7,6 +7,9 @@ public:
     explicit Trait (int value);
     virtual ~Trait() = default;
 
+    void decrease(int amount);
+    void increase(int amount);
+
     int value() const;
 
 protected:
@@ -17,12 +20,7 @@ class Health : public Trait {
 public:
     explicit Health(int value);
 
-    void decrease(int amount);
-
-    void increase(int amount);
-
     bool isZero() const;
-
 };
 
 class Armor : public Trait {

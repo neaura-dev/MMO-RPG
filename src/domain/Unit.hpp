@@ -1,196 +1,123 @@
 #pragma once
 
-#include <memory>
-#include "Trait.hpp"
+#include "GameObject.hpp"
 
-enum class UnitType {
+#include <memory>
+
+class Base;
+
+enum class UnitFamily {
     KingdomGuardian,
     ForestKeeper,
     Undead
 };
 
-class Unit {
-public:
-    Unit(int pos_x, int pos_y, Health health, Armor armor, Attack attack);
-
-    virtual ~Unit() = default;
-
-    Unit(const Unit& other) = default;
-    Unit& operator=(const Unit& other) = delete;
-
-    Unit(Unit&& other) = delete;
-    Unit& operator=(Unit&& other) = delete;
-
-    int pos_x() const;
-    int pos_y() const;
-    Health& health();
-    const Health& health() const;
-    const Armor& armor() const;
-    const Attack& attack() const;
-
-    void change_pos(int pos_x, int pos_y);
-
-    virtual UnitType type() const = 0;
-
-    virtual std::unique_ptr<Unit> clone() const = 0;
-
-private:
-    int pos_x_;
-    int pos_y_;
-    Health health_;
-    Armor armor_;
-    Attack attack_;
+enum class UnitType {
+    Knight,
+    Archer,
+    Mage
 };
 
-class Knight : public Unit {
+class Unit : public GameObject {
 public:
-    Knight(int pos_x, int pos_y);
+    Unit(int pos_x, int pos_y, Health health, Armor armor, Attack attack);
+    virtual ~Unit() = default;
 
-    ~Knight() override {};
+    void set_owner_base(Base* base) { owner_base_ = base; }
+    Base* get_owner_base() const { return owner_base_; }
+
+    virtual UnitType type() const = 0;
+    virtual UnitFamily family() const = 0;
+    virtual std::unique_ptr<Unit> clone() const = 0;
+
+protected:
+    Base* owner_base_ = nullptr;
+};
+
+// TYPES
+class Knight : public Unit {
+protected:
+    Knight(int pos_x, int pos_y);
+public:
+    UnitType type() const override { return UnitType::Knight; }
 };
 
 class Archer : public Unit {
-public:
+protected:
     Archer(int pos_x, int pos_y);
-    
-    ~Archer() override {};
+public:
+    UnitType type() const override { return UnitType::Archer; }
 };
 
 class Mage : public Unit {
-public:
+protected:
     Mage(int pos_x, int pos_y);
-
-    ~Mage() override {};
+public:
+    UnitType type() const override { return UnitType::Mage; }
 };
 
-// Kingdom Guardians
-
+// KINGDOM GUARDIANS
 class Paladin : public Knight {
 public:
     Paladin(int pos_x, int pos_y);
-
-    ~Paladin() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::KingdomGuardian; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class CrossbowMan : public Archer {
 public:
     CrossbowMan(int pos_x, int pos_y);
-
-    ~CrossbowMan() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::KingdomGuardian; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class Cleric : public Mage {
 public:
     Cleric(int pos_x, int pos_y);
-
-    ~Cleric() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::KingdomGuardian; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
-// Forest Keepers
-
+// FOREST KEEPERS
 class Ent : public Knight {
 public:
     Ent(int pos_x, int pos_y);
-
-    ~Ent() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::ForestKeeper; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class Centaur : public Archer {
 public:
     Centaur(int pos_x, int pos_y);
-
-    ~Centaur() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::ForestKeeper; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class Druid : public Mage {
 public:
     Druid(int pos_x, int pos_y);
-
-    ~Druid() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::ForestKeeper; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
-// Undeads
-
+// UNDEADS
 class Skeleton : public Knight {
 public:
     Skeleton(int pos_x, int pos_y);
-
-    ~Skeleton() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::Undead; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class ShadowArcher : public Archer {
 public:
     ShadowArcher(int pos_x, int pos_y);
-
-    ~ShadowArcher() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::Undead; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
 
 class Necromancer : public Mage {
 public:
     Necromancer(int pos_x, int pos_y);
-
-    ~Necromancer() override {};
-
-    UnitType type() const override;
-
+    UnitFamily family() const override { return UnitFamily::Undead; }
     std::unique_ptr<Unit> clone() const override;
-
-private:
-    UnitType type_;
 };
